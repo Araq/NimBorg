@@ -13,7 +13,7 @@ for i in 0..len(path)-1:
 
 echo ""
 
-# mix nimrod member access and python member access in the same expression:
+# mix nim member access and python member access in the same expression:
 let p = (x: 1, y: 1)
 var py_pi = pyImport("math").atan(p.y/p.x)
 let nim_pi = toFloat(4 * py_pi)
@@ -26,13 +26,13 @@ assert(toFloat(4.2)==4.2)
 
 # for some reason, the compiler refuses to apply a converter that
 # takes either an array or an openarray as input, so I can only auto-convert
-# seqs to PPyRef. Thus, the RHS of assignment can contain seqs, but not 
+# seqs to PPyRef. Thus, the RHS of assignment can contain seqs, but not
 # arrays.
 let d = pyDict()
 d["name"] = "fred"
 d["age"] = 42
-d["coordinates"] = @[10.2, -13.2]
-d["phones"] = @["0552-1234567", "1122-7009162"]
+d["coordinates"] = toPy(@[10.2, -13.2])
+d["phones"] = toPy(@["0552-1234567", "1122-7009162"])
 echo d
 
 # a little arithmetic:

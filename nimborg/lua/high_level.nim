@@ -6,7 +6,7 @@ from strutils import format, `%`
 
 # TODO: 
 #
-# * call nimrod functions from lua
+# * call nim functions from lua
 # * more error handling
 # * each proc should check that its args belong to the same lua state,
 #   subject perhaps to a compilation flag
@@ -17,7 +17,7 @@ type
     L: lua.PState
   PLuaState* = ref LuaState
 
-  # A non-borrowed (counted) reference. Avoid copying these around! Nimrod 
+  # A non-borrowed (counted) reference. Avoid copying these around! Nim 
   # doesn't have the equivalent of an assignment constructor (yet?), so any
   # copy of a LuaRef must be counted (use dup for that).
   LuaRef = object {.byref.}
@@ -190,9 +190,9 @@ proc callWithLuaRefs(f: PLuaRef, args: varargs[PLuaRef]): PLuaRef =
     luaError(err_code, toString(err_text))
   assert(result!=nil)
 
-proc newLuaCall(func: PNimrodNode, args: openarray[PNimrodNode]): PNimrodNode {.compileTime.} =
+proc newLuaCall(func: NimNode, args: openarray[NimNode]): NimNode {.compileTime.} =
   template let_f(f: expr, func: PLuaRef, body: expr): expr {.immediate.} = 
-    # a workaround to nimrod issue #904
+    # a workaround to nim issue #904
     (proc(f: PLuaref): PLuaRef = body)(func)
   let f = gensym(nskParam, "f")
   let body = newCall(bindSym"callWithLuaRefs", f)
@@ -201,7 +201,7 @@ proc newLuaCall(func: PNimrodNode, args: openarray[PNimrodNode]): PNimrodNode {.
     body.add(newCall(bindSym"toLua", state, args[i]))
   result = getAst(let_f(f, func, body))
 
-proc argsFromCS(cs: PNimrodNode, nDropped: int): seq[PNimrodNode] {.compileTime.} =
+proc argsFromCS(cs: NimNode, nDropped: int): seq[NimNode] {.compileTime.} =
   result = @[]
   for i in nDropped..len(cs)-1: result.add(cs[i])
 
